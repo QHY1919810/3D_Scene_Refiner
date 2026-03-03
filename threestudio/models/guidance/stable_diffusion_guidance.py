@@ -123,6 +123,7 @@ class StableDiffusionGuidance(BaseObject):
                 subfolder="scheduler",
                 torch_dtype=self.weights_dtype,
             )
+            #self.scheduler = self.pipe.scheduler
 
         self.num_train_timesteps = self.scheduler.config.num_train_timesteps
         self.set_min_max_steps()  # set to default value

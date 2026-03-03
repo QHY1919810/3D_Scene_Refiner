@@ -9,4 +9,5 @@ from . import (
     stable_zero123_guidance,
     zero123_guidance,
     zero123_unified_guidance,
+    qwen_image_guidance,
 )

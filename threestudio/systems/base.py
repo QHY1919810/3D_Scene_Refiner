@@ -23,6 +23,8 @@ from threestudio.utils.misc import (
 from threestudio.utils.saving import SaverMixin
 from threestudio.utils.typing import *
 
+from typing import Any, Dict, Optional
+
 
 class BaseSystem(pl.LightningModule, Updateable, SaverMixin):
     @dataclass
@@ -30,7 +32,8 @@ class BaseSystem(pl.LightningModule, Updateable, SaverMixin):
         loggers: dict = field(default_factory=dict)
         loss: dict = field(default_factory=dict)
         optimizer: dict = field(default_factory=dict)
-        scheduler: Optional[dict] = None
+        #scheduler: Optional[dict] = None
+        scheduler: Optional[Dict[str, Any]] = None
         weights: Optional[str] = None
         weights_ignore_modules: Optional[List[str]] = None
         cleanup_after_validation_step: bool = False

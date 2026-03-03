@@ -196,3 +196,9 @@ wandb/
 custom/*
 
 load/tets/256_tets.npz
+
+# skip large models
+models/
+
+# skip generated outputs
+outputs/
