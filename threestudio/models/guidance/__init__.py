@@ -10,4 +10,7 @@ from . import (
     zero123_guidance,
     zero123_unified_guidance,
     qwen_image_guidance,
+    qwen_image_guidance_low_mem,
+    qwen_image_2512_guidance,
+    qwen_image_2512_guidance_low_mem,
 )
