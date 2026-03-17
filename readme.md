@@ -122,6 +122,7 @@
 当前训练启动脚本。
 
 ### 数据集
+- 下载链接 `https://drive.google.com/file/d/1roVCsa2I_b4Cq7y0TmjDCam1FKqIWrx8/view?usp=sharing`
 - 解压并放在`3D_Scene_Refiner/dataset`
 
 当前训练启动脚本。
