@@ -1,0 +1,2 @@
+re-render, redraw, new scene, different camera angle, different perspective, changed horizon, moved car, changed car shape, different car model, extra objects, people, animals, buildings, plants, clouds, text, watermark, logo, oversmooth, plastic sand, heavy blur, painterly, cartoon, stylized, smear, glitch, artifacts, double image, ghosting, distortion.
+ 

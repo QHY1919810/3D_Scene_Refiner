@@ -1,0 +1,210 @@
+# -----------------------------------------------------------------------------
+# Observed-view supervised + Qwen Image SDS (NO rewrite)
+# Based on the user's uploaded rewrite config, adapted for:
+#   - enable_sds: true
+#   - enable_sup: true
+#   - enable_rewrite: false
+#   - guidance_type: qwen-image-sds-guidance-low-mem
+# -----------------------------------------------------------------------------
+
+name: "gs-observed-sup-qwen-sds"
+tag: "obs_sup_qwen_sds"
+exp_root_dir: "outputs"
+seed: 0
+
+# -----------------------------------------------------------------------------
+# Data: COLMAP observed views (scene-coordinates TXT model)
+# -----------------------------------------------------------------------------
+data_type: "colmap-scene-datamodule"
+data:
+  repo_root: "/nfs4/qhy/projects/threestudio"
+  scene_colmap_txt_root: "/nfs4/qhy/projects/threestudio/dataset/camera_transpose_result"
+
+  # GT images / masks
+  rgb_root: "/nfs4/qhy/projects/threestudio/dataset/car_images/input"
+  mask_root: "/nfs4/qhy/projects/threestudio/dataset/car_images/car_masks"
+  use_masks: true
+
+  batch_size: 1
+  num_workers: 0
+  shuffle: true
+  pin_memory: false
+
+  max_items: 1  # 0=all; else first N (sorted by view_id)
+
+# -----------------------------------------------------------------------------
+# System
+# -----------------------------------------------------------------------------
+system_type: "gaussian-splatting-system"
+system:
+  loss_plot_enable: true
+  loss_plot_every_n_steps: 1
+  loss_plot_max_points: 500
+  loss_plot_path: "/nfs4/qhy/projects/threestudio/test_datas/debugs3/loss_curve.png"
+
+  save_ply_every_n_steps: 400
+  save_ply_overwrite: false
+  save_ply_dir: ""
+
+  enable_sds: true
+  enable_sup: true
+  enable_rewrite: false
+
+  # SDS guidance: Qwen-Image true SDS, low-memory version
+  guidance_type: "qwen-image-sds-guidance-low-mem"
+  guidance:
+    diffsynth_repo_root: "/nfs4/qhy/projects/DiffSynth-Studio"
+    models_cache_root: "/nfs4/qhy/projects/DiffSynth-Studio/models/Qwen"
+
+    # Prompt resolution in this guidance is:
+    # kwargs['prompt'] -> guidance.prompt -> prompt_utils.prompt
+    prompt: |
+      严格编辑模式（最小改动原则）：你将收到一张输入图像。请对同一张图进行“清理与融合”式编辑，必须保持构图、镜头视角、透视关系、地平线位置、地形轮廓、车辆与雪山/沙丘的位置与形状完全不变（像素布局不变）。
+      你的修改只能是局部修复/去噪/去杂物与轻微光照融合，不得重绘或重新生成整张场景；如果某项修改会导致任何物体形状/位置变化，请宁可不改。
+      需要做的编辑（只做这些）:
+      1. 清理前景与车辆周围杂物/伪影：移除不属于场景的漂浮碎片、绿色条状/块状物、黑色碎屑、异常涂抹、扭曲线条、破碎片、飞散点状杂质；并用连续自然的沙纹无缝修复，保持沙地质感与细节，不要变成平滑塑料。
+      2. 清理远景噪声：去除天空/雪山/地平线附近的颗粒、斑点、脏污、漂浮噪点、重建残渣；让雪山边缘更干净、层次更自然，但不改变雪山轮廓与位置。
+      3. 真实感融合（轻微、保守）：保持车辆外观设计细节与颜色完全不变（车灯/车窗/车标/轮毂等都不改），仅做轻微光照一致性调整：让车体高光方向、阴影强度与接地阴影更贴合环境（沙漠散射光 + 远处雪山冷色环境光），让轮胎接触更合理。
+      严格禁止：
+      1. 禁止重新生成/重绘整张图，禁止改变构图/镜头/视角/透视/地平线。
+      2. 禁止移动、替换、改变车辆/雪山/沙丘的形状与位置。
+      3. 禁止新增任何物体（人/动物/建筑/植被/云/文字/水印/logo）。
+      4. 禁止产生新的伪影（涂抹块、拉丝、重影、变形、过度磨皮、过度锐化）。
+    negative_prompt: |
+      re-render, redraw, new scene, different camera angle, different perspective,
+      changed horizon, moved car, changed car shape, different car model,
+      extra objects, people, animals, buildings, plants, clouds,
+      text, watermark, logo, oversmooth, plastic sand, heavy blur,
+      painterly, cartoon, stylized, smear, glitch, artifacts,
+      double image, ghosting, distortion
+
+    seed: 1
+    num_inference_steps: 20
+    denoising_strength: 1.0
+    guidance_scale: 10.0
+    min_step_percent: 0.02
+    max_step_percent: 0.98
+    zero_cond_t: true
+    edit_image_auto_resize: false
+    fallback_edit_from_render: true
+
+    clamp_rgb: true
+    max_render_res: 1024
+    masked_loss: true
+    loss_downsample: 1
+
+    offload_dtype: "disk"
+    offload_device: "disk"
+    onload_dtype: "float8_e4m3fn"
+    onload_device: "cpu"
+    preparing_dtype: "float8_e4m3fn"
+    preparing_device: "cuda"
+    computation_dtype: "bfloat16"
+    computation_device: "cuda"
+
+    tiled: false
+    tile_size: 128
+    tile_stride: 64
+
+  # Rewrite settings stay defined for compatibility but are disabled by enable_rewrite: false
+  rewrite_update_interval: 40
+  rewrite_edit_source: "render"
+  rewrite_loss_type: "l2"
+  rewrite_masked: true
+
+  # Debug image dumps
+  # With SDS enabled and rewrite disabled, the system should still dump render images,
+  # but there will be no qwen_edit teacher images.
+  save_debug_images: true
+  save_debug_interval: 1
+  save_debug_include_step: true
+  save_debug_dir: "/nfs4/qhy/projects/threestudio/test_datas/debugs3"
+
+  material_type: "gaussian-diffuse-with-point-light-material"
+
+  geometry_type: "gaussian-splatting"
+  geometry:
+    geometry_convert_from: "/nfs4/qhy/projects/threestudio/dataset/scene_resized_/scene_plus_car_tagged.ply"
+
+    position_lr: [0, 0.001, 0.00002, 1000]
+    scale_lr: 0.005
+    feature_lr: 0.01
+    opacity_lr: 0.05
+    rotation_lr: 0.005
+
+    densification_interval: 300
+    prune_interval: 1000000000
+    opacity_reset_interval: 50000000
+
+    densify_from_iter: 500
+    densify_until_iter: ${trainer.max_steps}
+    prune_from_iter: 1000000000
+    prune_until_iter: ${trainer.max_steps}
+
+    densify_grad_threshold: 0.01
+    min_opac_prune: 0.0
+    split_thresh: 0.02
+    radii2d_thresh: 1000
+
+    init_num_pts: 4096
+    pc_init_radius: 0.8
+    opacity_init: 0.2
+
+  renderer_type: "diff-gaussian-rasterizer"
+  renderer:
+    debug: false
+
+  background_type: "gaussian-mvdream-neural-environment-map-background"
+  background:
+    color_activation: sigmoid
+    random_aug: false
+    random_aug_prob: 0.0
+
+  # Prompt processor is kept for compatibility with the current system,
+  # but the Qwen SDS guidance above uses guidance.prompt / guidance.negative_prompt first.
+  prompt_processor_type: "stable-diffusion-prompt-processor"
+  prompt_processor:
+    pretrained_model_name_or_path: "sd2-community/stable-diffusion-2-1-base"
+    prompt: ""
+    negative_prompt: ""
+
+  loss:
+    lambda_sds: 1.0
+    lambda_rgb: 1.0
+    lambda_silhouette: 0.0
+    lambda_rewrite: 0.0
+
+    lambda_position: 1.0
+    lambda_opacity: 0.0001
+    lambda_scales: 0.0001
+    lambda_tv_loss: 0.0
+    lambda_depth_tv_loss: 0.0
+
+    lambda_hf: 0.1
+  hf_mode: "laplacian"
+  hf_loss_type: "l1"
+  hf_grayscale: true
+  hf_mask_dilate: 2
+
+  optimizer:
+    name: Adam
+    args:
+      lr: 0
+      betas: [0.9, 0.99]
+      eps: 1.e-15
+    params:
+      background:
+        lr: 0
+
+trainer:
+  max_steps: 5000
+  log_every_n_steps: 1
+  num_sanity_val_steps: 0
+  val_check_interval: 1
+  enable_progress_bar: true
+  precision: 32-true
+
+checkpoint:
+  save_last: true
+  save_top_k: -1
+  every_n_train_steps: ${trainer.max_steps}
