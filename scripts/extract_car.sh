@@ -1,0 +1,13 @@
+python /nfs4/qhy/projects/threestudio/scripts/extract_car_v3.py \
+  --ply /nfs4/qhy/projects/gaussian-splatting/output/car5/point_cloud/iteration_30000/point_cloud.ply \
+  --images /nfs4/qhy/datasets/Converted_3DGS/car5/images \
+  --sparse /nfs4/qhy/datasets/Converted_3DGS/car5/sparse/txt \
+  --n_views 300 \
+  --out_ply /nfs4/qhy/projects/threestudio/dataset/test_cars/car_only_clean.ply \
+  --sam_ckpt /nfs4/qhy/projects/Segment-Anything/sam_vit_h_4b8939.pth \
+  --sam_model vit_h \
+  --sam_use_center \
+  --mask_erode_px 8 \
+  --use_dbscan \
+  --use_sor \
+  --remove_ground

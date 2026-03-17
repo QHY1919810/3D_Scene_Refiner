@@ -1,0 +1,47 @@
+# Big data / generated
+dataset/
+datasets/
+data/
+outputs/
+output/
+results/
+runs/
+logs/
+checkpoints/
+weights/
+models/
+load/          # 关键：load 往往很大（图片/obj/hdr/npz 等）
+
+# common large types
+*.db
+*.bin
+*.ply
+*.npz
+*.npy
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.safetensors
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.mp4
+*.mov
+*.avi
+
+# python / cache
+__pycache__/
+*.pyc
+.venv/
+venv/
+.cache/
+wandb/
+
+# editor
+.idea/
+.vscode/
+.DS_Store
