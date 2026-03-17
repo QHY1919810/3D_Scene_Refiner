@@ -87,7 +87,7 @@
 ## 3. 主要文件说明
 
 ### 核心系统文件
-- `/nfs4/qhy/projects/threestudio/custom/threestudio-3dgs/system/gaussian_splatting.py`
+- `3D_Scene_Refiner/custom/threestudio-3dgs/system/gaussian_splatting.py`
 
 主要负责：
 
@@ -100,7 +100,7 @@
 - skip no-mask 逻辑
 
 ### 几何文件
-- `/nfs4/qhy/projects/threestudio/custom/threestudio-3dgs/geometry/gaussian_base.py`
+- `3D_Scene_Refiner/custom/threestudio-3dgs/geometry/gaussian_base.py`
 
 主要负责：
 
@@ -112,17 +112,17 @@
 - prune 后同步维护标签
 
 ### 配置文件
-- `/nfs4/qhy/projects/threestudio/custom/threestudio-3dgs/configs/gaussian_splatting_static_routed_fixed_teacher_merged.yaml`
+- `3D_Scene_Refiner/custom/threestudio-3dgs/configs/gaussian_splatting_static_routed_fixed_teacher_merged.yaml`
 
 当前主实验配置入口。
 
 ### 启动脚本
-- `/nfs4/qhy/projects/threestudio/bashes/train_observed_supervise_only.sh`
+- `3D_Scene_Refiner/bashes/train_observed_supervise_only.sh`
 
 当前训练启动脚本。
 
 ### 数据集
-- 解压并放在`/nfs4/qhy/projects/threestudio/dataset`
+- 解压并放在`3D_Scene_Refiner/dataset`
 
 当前训练启动脚本。
 
